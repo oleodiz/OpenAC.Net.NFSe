@@ -71,7 +71,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Content Remove="Commom\Types\CodigoTOM.*.cs"/>
+		<Content Remove="Commom\Types\CodigoTOM.*.cs" />
 		<Content Include="Commom\Types\CodigoTOM.*.cs">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<DependentUpon>Commom\Types\CodigoTOM.cs</DependentUpon>
@@ -415,6 +415,12 @@
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 		<EmbeddedResource Remove="Commom\Model\Interfaces\**" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <None Update="Schemas\Tributus\2.04\nfse.xsd">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>
 
 </Project>

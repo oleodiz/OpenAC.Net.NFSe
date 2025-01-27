@@ -30,6 +30,7 @@
 // ***********************************************************************
 
 using System;
+using System.Linq;
 using System.Text;
 using System.Xml.Linq;
 using OpenAC.Net.Core.Extensions;
@@ -38,6 +39,7 @@ using OpenAC.Net.DFe.Core.Common;
 using OpenAC.Net.NFSe.Commom;
 using OpenAC.Net.NFSe.Commom.Client;
 using OpenAC.Net.NFSe.Commom.Interface;
+using OpenAC.Net.NFSe.Commom.Model;
 using OpenAC.Net.NFSe.Commom.Types;
 
 namespace OpenAC.Net.NFSe.Providers;
@@ -57,14 +59,16 @@ internal sealed class Tributus204ServiceClient : NFSeSoapServiceClient, IService
     public string Enviar(string cabec, string msg)
     {
         var message = new StringBuilder();
-        message.Append("<e:A24_RecepcionarLoteRPS.Execute>");
-        message.Append("<e:Nfsecabecmsg>");
+        message.Append("<nfse:RecepcionarLoteRpsRequest>");
+        message.Append("<nfseCabecMsg>");
         message.AppendCData(cabec);
-        message.Append("</e:Nfsecabecmsg>");
-        message.Append("<e:Nfsedadosmsg>");
+        message.Append("</nfseCabecMsg>");
+        message.Append("<nfseDadosMsg>");
         message.AppendCData(msg);
-        message.Append("</e:Nfsedadosmsg>");
-        message.Append("</e:A24_RecepcionarLoteRPS.Execute>");
+        message.Append("</nfseDadosMsg>");
+        message.Append("</nfse:RecepcionarLoteRpsRequest>");
+
+        message.Replace("Id=", "id=");
 
         return Execute("AA24_RECEPCIONARLOTERPS.Execute", message.ToString(),
             "EnviarLoteRpsResposta");
@@ -92,16 +96,16 @@ internal sealed class Tributus204ServiceClient : NFSeSoapServiceClient, IService
     public string ConsultarLoteRps(string cabec, string msg)
     {
         var message = new StringBuilder();
-        message.Append("<e:A24_ConsultarLoteRps.Execute>");
-        message.Append("<e:Nfsecabecmsg>");
+        message.Append("<nfse:ConsultarLoteRpsRequest>");
+        message.Append("<nfseCabecMsg>");
         message.AppendCData(cabec);
-        message.Append("</e:Nfsecabecmsg>");
-        message.Append("<e:Nfsedadosmsg>");
+        message.Append("</nfseCabecMsg>");
+        message.Append("<nfseDadosMsg>");
         message.AppendCData(msg);
-        message.Append("</e:Nfsedadosmsg>");
-        message.Append("</e:A24_ConsultarLoteRps.Execute>");
+        message.Append("</nfseDadosMsg>");
+        message.Append("</nfse:ConsultarLoteRpsRequest>");
 
-        return Execute("AA24_ACONSULTARLOTERPS.Execute", message.ToString(),
+        return Execute("ConsultarLoteRpsRequest", message.ToString(),
             "ConsultarLoteRpsResposta");
     }
 
@@ -178,7 +182,7 @@ internal sealed class Tributus204ServiceClient : NFSeSoapServiceClient, IService
     private string Execute(string soapAction, string message, string responseTag)
     {
         return Execute($"http://www.e-nfs.com.braction/{soapAction}", message, "",
-            [responseTag], ["xmlns:e=\"http://www.e-nfs.com.br\""]);
+            [responseTag], ["xmlns:nfse=\"http://www.abrasf.org.br/nfse.xsd\""]);
     }
 
     protected override bool ValidarCertificadoServidor()
@@ -189,12 +193,15 @@ internal sealed class Tributus204ServiceClient : NFSeSoapServiceClient, IService
     protected override string TratarRetorno(XElement xmlDocument, string[] responseTag)
     {
         var element = xmlDocument.ElementAnyNs("Fault");
-        if (element == null) return xmlDocument.ElementAnyNs(responseTag[0]).ElementAnyNs("Outputxml").Value;
+        if (element == null)
+        {
+            element = responseTag.Aggregate(xmlDocument, (current, tag) => current.ElementAnyNs(tag));
+            return element.ToString();
+        }
 
-        var exMessage =
-            $"{element.ElementAnyNs("faultcode").GetValue<string>()} - {element.ElementAnyNs("faultstring").GetValue<string>()}";
+        var exMessage = $"{element.ElementAnyNs("faultcode").GetValue<string>()} - {element.ElementAnyNs("faultstring").GetValue<string>()}";
         throw new OpenDFeCommunicationException(exMessage);
-    }
 
+    }
     #endregion Methods
 }

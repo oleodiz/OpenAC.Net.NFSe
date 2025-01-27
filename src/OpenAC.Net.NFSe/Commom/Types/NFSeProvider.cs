@@ -138,5 +138,7 @@ public enum NFSeProvider : sbyte
     [Description("ISS Integra - Nobe Sistemas")]
     ISSIntegra = 47,
 
-    ISSRecife = 48
+    ISSRecife = 48,
+
+    Tributos = 51,
 }

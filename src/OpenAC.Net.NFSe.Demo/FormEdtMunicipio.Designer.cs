@@ -167,6 +167,7 @@ namespace OpenAC.Net.NFSe.Demo
             cmbProvedor.FormattingEnabled = true;
             cmbProvedor.Location = new System.Drawing.Point(14, 81);
             cmbProvedor.Margin = new System.Windows.Forms.Padding(4);
+            cmbProvedor.Margin = new System.Windows.Forms.Padding(4);
             cmbProvedor.Name = "cmbProvedor";
             cmbProvedor.Size = new System.Drawing.Size(178, 23);
             cmbProvedor.TabIndex = 12;

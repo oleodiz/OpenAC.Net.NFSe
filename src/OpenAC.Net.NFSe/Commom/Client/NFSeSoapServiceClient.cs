@@ -113,7 +113,7 @@ public abstract class NFSeSoapServiceClient : NFSeHttpServiceClient
 
             default:
                 throw new ArgumentOutOfRangeException();
-        }
+        }   
 
         envelope.Append(soapNamespaces.Aggregate("", (atual, next) => atual + $" {next}", namespaces => namespaces + ">"));
         envelope.Append(soapHeader.IsEmpty() ? "<soapenv:Header/>" : $"<soapenv:Header>{soapHeader}</soapenv:Header>");
